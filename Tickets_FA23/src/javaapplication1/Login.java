@@ -1,95 +1,81 @@
 package javaapplication1;
 
-import java.awt.GridLayout; //useful for layouts
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-//controls-label text fields, button
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-
 @SuppressWarnings("serial")
 public class Login extends JFrame {
 
-	Dao conn;
+    private Dao conn;
 
-	public Login() {
-		
-		super("IIT HELP DESK LOGIN");
-		
-		conn = new Dao();
-		conn.createTables();
-		setSize(400, 210);
-		setLayout(new GridLayout(4, 2));
-		setLocationRelativeTo(null); // centers window
+    public Login() {
+        super("🚀 IIT HELP DESK LOGIN 🚀");
 
-		// SET UP CONTROLS
-		JLabel lblUsername = new JLabel("Username", JLabel.LEFT);
-		JLabel lblPassword = new JLabel("Password", JLabel.LEFT);
-		JLabel lblStatus = new JLabel(" ", JLabel.CENTER);
-		// JLabel lblSpacer = new JLabel(" ", JLabel.CENTER);
+        conn = new Dao();
+        conn.createTables();
+        setSize(600, 300);
+        setLayout(new GridLayout(5, 2));
+        setLocationRelativeTo(null);
 
-		JTextField txtUname = new JTextField(10);
+        JLabel lblUsername = new JLabel("👤 Username", JLabel.CENTER);
+        JLabel lblPassword = new JLabel("🔒 Password", JLabel.CENTER);
+        JLabel lblStatus = new JLabel(" ", JLabel.CENTER);
 
-		JPasswordField txtPassword = new JPasswordField();
-		JButton btn = new JButton("Submit");
-		JButton btnExit = new JButton("Exit");
+        JTextField txtUname = new JTextField(10);
+        JPasswordField txtPassword = new JPasswordField();
+        JButton btn = new JButton("🚀 Submit");
+        JButton btnExit = new JButton("🚪 Exit");
 
-		// constraints
+        lblStatus.setForeground(Color.RED);
+        lblStatus.setFont(new Font("Arial", Font.BOLD, 14));
 
-		lblStatus.setToolTipText("Contact help desk to unlock password");
-		lblUsername.setHorizontalAlignment(JLabel.CENTER);
-		lblPassword.setHorizontalAlignment(JLabel.CENTER);
- 
-		// ADD OBJECTS TO FRAME
-		add(lblUsername);  // 1st row filler
-		add(txtUname);
-		add(lblPassword);  // 2nd row
-		add(txtPassword);
-		add(btn);          // 3rd row
-		add(btnExit);
-		add(lblStatus);    // 4th row
+        add(lblUsername);
+        add(txtUname);
+        add(lblPassword);
+        add(txtPassword);
+        add(btn);
+        add(btnExit);
+        add(lblStatus);
 
-		btn.addActionListener(new ActionListener() {
-			int count = 0; // count agent
+        btn.addActionListener(new ActionListener() {
+            int count = 0;
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				boolean admin = false;
-				count = count + 1;
-				// verify credentials of user (MAKE SURE TO CHANGE TO YOUR TABLE NAME BELOW)
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean admin = false;
+                count = count + 1;
 
-				String query = "SELECT * FROM hamza_jpapa_users WHERE uname = ? and upass = ?;";
-				try (PreparedStatement stmt = conn.getConnection().prepareStatement(query)) {
-					stmt.setString(1, txtUname.getText());
-					stmt.setString(2, txtPassword.getText());
-					ResultSet rs = stmt.executeQuery();
-					if (rs.next()) {
-						admin = rs.getBoolean("admin"); // get table column value
-						new Tickets(admin); //open Tickets file / GUI interface
-						setVisible(false); // HIDE THE FRAME
-						dispose(); // CLOSE OUT THE WINDOW
-					} else
-						lblStatus.setText("Try again! " + (3 - count) + " / 3 attempt(s) left");
-				} catch (SQLException ex) {
-					ex.printStackTrace();
-				}
- 			 
-			}
-		});
-		btnExit.addActionListener(e -> System.exit(0));
+                String query = "SELECT * FROM hamza_jpapa_users WHERE uname = ? and upass = ?;";
+                try (PreparedStatement stmt = conn.getConnection().prepareStatement(query)) {
+                    stmt.setString(1, txtUname.getText());
+                    stmt.setString(2, new String(txtPassword.getPassword()));
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next()) {
+                        admin = rs.getBoolean("admin");
+                        new Tickets(admin);
+                        setVisible(false);
+                        dispose();
+                    } else {
+                        lblStatus.setText("❌ Try again! " + (3 - count) + " / 3 attempt(s) left");
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
-		setVisible(true); // SHOW THE FRAME
-	}
+        btnExit.addActionListener(e -> System.exit(0));
 
-	public static void main(String[] args) {
+        setVisible(true);
+    }
 
-		new Login();
-	}
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new Login());
+    }
 }
